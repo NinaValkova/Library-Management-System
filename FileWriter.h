@@ -6,7 +6,7 @@
 class FileWriter
 {
 public:
-	// Записва във файл информацията за книгите, които са с повече от един автора.
+	// Р—Р°РїРёСЃРІР° РІСЉРІ С„Р°Р№Р» РёРЅС„РѕСЂРјР°С†РёСЏС‚Р° Р·Р° РєРЅРёРіРёС‚Рµ, РєРѕРёС‚Рѕ СЃР° СЃ РїРѕРІРµС‡Рµ РѕС‚ РµРґРёРЅ Р°РІС‚РѕСЂР°.
 	static void save(const Library& library, const char* fileName)
 	{
 		std::ofstream out(fileName);
@@ -23,6 +23,7 @@ public:
 	}
 
 };
+
 
 
 #endif
