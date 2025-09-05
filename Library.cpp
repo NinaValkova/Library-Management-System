@@ -86,7 +86,7 @@ void Library::setBook(Book& book)
 	addBook(book);
 }
 
-// книги, подредени по азбучен ред на авторите.
+// РєРЅРёРіРё, РїРѕРґСЂРµРґРµРЅРё РїРѕ Р°Р·Р±СѓС‡РµРЅ СЂРµРґ РЅР° Р°РІС‚РѕСЂРёС‚Рµ.
 void Library::sortByAuthor()
 {
 
@@ -122,3 +122,4 @@ Library::~Library()
 
 	delete[] books;
 }
+
