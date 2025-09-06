@@ -27,7 +27,7 @@ Book::Book(const Book& other) : time(other.time)
 
 	for (size_t i = 0; i < numAuthors; i++)
 	{
-		authors[i] = other.authors[i]; 
+		this->authors[i] = Author(other.authors[i]);
 	}
 
 	isAvailable = other.isAvailable;
@@ -145,3 +145,4 @@ Book::~Book()
 	delete[] bookName;
 
 }
+
