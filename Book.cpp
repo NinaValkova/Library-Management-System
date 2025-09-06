@@ -25,7 +25,6 @@ Book::Book(const Book& other) : time(other.time)
 {
 	numAuthors = other.numAuthors;
 
-	// ne e korectno
 	for (size_t i = 0; i < numAuthors; i++)
 	{
 		authors[i] = other.authors[i]; 
@@ -144,4 +143,5 @@ size_t Book::getNumAuthors()
 Book::~Book()
 {
 	delete[] bookName;
+
 }
