@@ -1,0 +1,69 @@
+services:
+  lms_user_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5450:5432"
+    environment:
+      POSTGRES_USER: lms_user_db
+      POSTGRES_PASSWORD: lms_user_db_password
+      POSTGRES_DB: lms_user_service
+    volumes:
+      - ./db-data/lms_user_db_server/:/var/lib/postgresql/data
+    networks:
+      - lms_net
+
+  lms_catalog_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5451:5432"
+    environment:
+      POSTGRES_USER: lms_catalog_db
+      POSTGRES_PASSWORD: lms_catalog_db_password
+      POSTGRES_DB: lms_catalog_service
+    volumes:
+      - ./db-data/lms_catalog_db_server/:/var/lib/postgresql/data
+    networks:
+      - lms_net
+
+  lms_borrow_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5452:5432"
+    environment:
+      POSTGRES_USER: lms_borrow_db
+      POSTGRES_PASSWORD: lms_borrow_db_password
+      POSTGRES_DB: lms_borrow_service
+    volumes:
+      - ./db-data/lms_borrow_db_server/:/var/lib/postgresql/data
+    networks:
+      - lms_net
+
+  lms_rating_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5453:5432"
+    environment:
+      POSTGRES_USER: lms_rating_db
+      POSTGRES_PASSWORD: lms_rating_db_password
+      POSTGRES_DB: lms_rating_service
+    volumes:
+      - ./db-data/lms_rating_db_server/:/var/lib/postgresql/data
+    networks:
+      - lms_net
+
+  lms_recommendation_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5454:5432"
+    environment:
+      POSTGRES_USER: lms_recommendation_db
+      POSTGRES_PASSWORD: lms_recommendation_db_password
+      POSTGRES_DB: lms_recommendation_service
+    volumes:
+      - ./db-data/lms_recommendation_db_server/:/var/lib/postgresql/data
+    networks:
+      - lms_net
+
+networks:
+  lms_net:
+    name: lms_net

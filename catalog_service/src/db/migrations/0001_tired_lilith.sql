@@ -1,0 +1,1 @@
+ALTER TABLE "books" ADD COLUMN "image_url" varchar(1000);

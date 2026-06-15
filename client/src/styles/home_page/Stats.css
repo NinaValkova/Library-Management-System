@@ -1,0 +1,33 @@
+#stats-section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  background-color: var(--bs-tertiary-bg);
+  width: 100%;
+  width: 1505px;
+  margin-left: -161px;
+  margin-right: 0px;
+  padding-right: 0px;
+}
+
+.stats-card {
+  height: 100%;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  background-color: #fff;
+}
+
+.stats-card-body {
+  padding: 1.5rem;
+}
+
+.stats-number {
+  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.stats-text {
+  margin-bottom: 0;
+  color: #6c757d;
+}

@@ -1,0 +1,15 @@
+#about-section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+#about-image {
+  width: 100%;
+  min-height: 400px;
+  background-image: url("../../assets/library3.avif");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}

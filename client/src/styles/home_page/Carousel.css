@@ -1,0 +1,35 @@
+#hero-section {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: -70px;
+  width: 2000px;
+  margin-left: -185px;
+  margin-right: 0px;
+  padding-right: 0px;
+}
+
+.hero-slide {
+  min-height: 650px;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#slide1 {
+  background-image: url("../../assets/library1.jpg");
+}
+
+#slide2 {
+  background-image: url("../../assets/library2.png");
+}
+
+.hero-overlay {
+  max-width: 2500px;
+}
+
+@media (min-width: 768px) {
+    .container, .container-md, .container-sm {
+        max-width: 1530px;
+    }
+}
