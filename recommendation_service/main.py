@@ -6,7 +6,6 @@ app = FastAPI(
     title="Library Recommendation API",
     description="Spark-based recommender system",
     version="3.0"
-)
 
 
 app.add_middleware(
@@ -21,7 +20,7 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {"message": "Library Recommender API is running 🚀"}
+    return {"message": "Library Recommender API"}
 
 
 @app.get("/recommend/{user_id}")
