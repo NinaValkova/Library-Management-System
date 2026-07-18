@@ -1,21 +1,10 @@
 import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
-import { DB } from "../db/db.connection";
-import { tokenBlocklist } from "../db/schemas";
 import { Request, Response, NextFunction } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: number;
-        username: string;
-        jti: string;
-        role: string;
-      };
-    }
-  }
-}
+import { DB } from "../db/db.connection";
+import { tokenBlocklist } from "../db/schemas";
+import { JWT_SECRET } from "../config";
 
 type AuthTokenPayload = jwt.JwtPayload & {
   id: number;
@@ -24,11 +13,15 @@ type AuthTokenPayload = jwt.JwtPayload & {
   role: string;
 };
 
-export const authMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthTokenPayload;
+    }
+  }
+}
+
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -42,7 +35,7 @@ export const authMiddleware = async (
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     if (typeof decoded === "string") {
       return res.status(403).json({ message: "Invalid token" });

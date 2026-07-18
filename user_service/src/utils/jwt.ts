@@ -1,10 +1,7 @@
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
+import { JWT_SECRET, JWT_EXPIRES_IN } from "../config";
 
-const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET!;
-
-const JWT_EXPIRES_IN =
-  (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) || "1d";
 
 export const generateToken = (payload: {
   id: number;
@@ -21,8 +18,9 @@ export const generateToken = (payload: {
     JWT_SECRET,
     {
       expiresIn: JWT_EXPIRES_IN,
+      algorithm: "HS256"
     }
   );
 
-  return { token, jti };
+  return { token };
 };

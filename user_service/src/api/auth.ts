@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import {
   RegisterUser,
   LoginUser,
@@ -7,36 +7,21 @@ import {
   RegisterAdminUser,
   GetUsersCount,
 } from "../service/auth.service";
-import type {
-  RegisterUserRequest,
-  RegisterAdminRequest,
-  LoginRequest,
-  RegisterResponse,
-  LoginResponse,
-  LogoutResponse,
-  SafeUser,
-} from "../dto/auth.dto";
-import { User } from "../db/schemas/users";
+import { SafeUser } from "../dto/response/SafeUser";
+import { RegisterResponse } from "../dto/response/RegisterResponse";
+import { RegisterUserRequest } from "../dto/request/RegisterUserRequest";
+import { LoginResponse } from "../dto/response/LoginResponse";
+import { LoginRequest } from "../dto/request/LoginRequest";
+import { LogoutResponse } from "../dto/response/LogoutResponse";
+import { RegisterAdminRequest } from "../dto/request/RegisterAdminRequest";
+import { UserMapper } from "../mapper/user.mapper";
 
-export const toSafeUser = (user: User): SafeUser => {
-  return {
-    id: user.id,
-    firstName: user.firstName,
-    secondName: user.secondName,
-    username: user.username,
-    email: user.email,
-    role: user.role,
-    birthNumber: user.birthNumber ?? null,
-    createdAt: user.createdAt,
-  };
-};
-
-export const register = async (req: Request<{}, RegisterResponse, RegisterUserRequest>, res: Response<RegisterResponse | { message: string }>) => {
+export const register = async (req: Request<{}, any, RegisterUserRequest>, res: Response<RegisterResponse | { message: string }>) => {
   try {
     const user = await RegisterUser(req.body);
     //const { password: _, ...safeUser } = user;
 
-    const safeUser = toSafeUser(user);
+    const safeUser = UserMapper.toSafeUser(user);
 
     return res.status(201).json({
       message: "User registered",
@@ -48,7 +33,7 @@ export const register = async (req: Request<{}, RegisterResponse, RegisterUserRe
   }
 };
 
-export const login = async (req:  Request<{}, LoginResponse, LoginRequest>, res: Response<LoginResponse | { message: string }>) => {
+export const login = async (req:  Request<{}, any, LoginRequest>, res: Response<LoginResponse | { message: string }>) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -57,7 +42,7 @@ export const login = async (req:  Request<{}, LoginResponse, LoginRequest>, res:
     const { token, user } = await LoginUser(req.body);
     //const { password: _, ...safeUser } = user;
 
-    const safeUser = toSafeUser(user);
+    const safeUser = UserMapper.toSafeUser(user);
 
     return res.status(200).json({
       message: "Login successful",
@@ -73,11 +58,9 @@ export const login = async (req:  Request<{}, LoginResponse, LoginRequest>, res:
 export const logout = async (req: Request, res:  Response<LogoutResponse>) => {
   try {
     const jti = req.user!.jti;
-    await LogoutUser(jti);
+    const result = await LogoutUser(jti);
 
-    return res.status(200).json({
-      message: "Logged out",
-    });
+    return res.status(200).json(result);
   } catch (error) {
     const err = error as Error;
     return res.status(500).json({ message: err.message });
@@ -100,7 +83,7 @@ export const getUser = async (req: Request,  res: Response<SafeUser | { message:
     const user = await GetUser(userId);
     //const { password: _, ...safeUser } = user;
 
-    const safeUser = toSafeUser(user);
+    const safeUser = UserMapper.toSafeUser(user);
 
     return res.status(200).json(safeUser);
   } catch (error) {
@@ -109,12 +92,12 @@ export const getUser = async (req: Request,  res: Response<SafeUser | { message:
   }
 };
 
-export const registerAdmin = async (req: Request<{}, RegisterResponse, RegisterAdminRequest>, res: Response<RegisterResponse | { message: string }>) => {
+export const registerAdmin = async (req: Request<{}, any, RegisterAdminRequest>, res: Response<RegisterResponse | { message: string }>) => {
   try {
     const user = await RegisterAdminUser(req.body);
     //const { password: _, ...safeUser } = user;
 
-    const safeUser = toSafeUser(user);
+    const safeUser = UserMapper.toSafeUser(user);
 
     return res.status(201).json({
       message: "Admin user registered",

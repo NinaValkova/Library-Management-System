@@ -1,14 +1,10 @@
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwt";
 import { UserRepository } from "../repository/user.repository";
-import { NewUser } from "../db/schemas/users";
-import { DB } from "../db/db.connection";
-import { tokenBlocklist } from "../db/schemas";
-import type {
-  RegisterUserRequest,
-  RegisterAdminRequest,
-  LoginRequest,
-} from "../dto/auth.dto";
+import { TokenBlocklistRepository } from "../repository/token_blocklist.repository";
+import { RegisterUserRequest } from "../dto/request/RegisterUserRequest";
+import { LoginRequest } from "../dto/request/LoginRequest";
+import { RegisterAdminRequest } from "../dto/request/RegisterAdminRequest";
 
 
 export const RegisterUser = async (data: RegisterUserRequest) => {
@@ -48,21 +44,27 @@ export const LoginUser = async (data: LoginRequest) => {
     throw new Error("Invalid credentials");
   }
 
-  const { token, jti } = generateToken({
+  const { token } = generateToken({
     id: user.id,
     username: user.username,
     role: user.role,
   });
 
-  return { token, jti, user };
+  return { token, user };
 };
 
 export const LogoutUser = async (jti: string) => {
-  await DB.insert(tokenBlocklist).values({
-    jti, 
+  const existingBlockedToken = await TokenBlocklistRepository.findByJti(jti);
+
+  if (existingBlockedToken) {
+    throw new Error("Token already blocked");
+  }
+
+  const blockedToken = await TokenBlocklistRepository.createTokenBlocklist({
+    jti,
   });
 
-  return { message: "Logged out" };
+  return { message: "Logged out" }
 };
 
 export const GetUser = async (id: number) => {
