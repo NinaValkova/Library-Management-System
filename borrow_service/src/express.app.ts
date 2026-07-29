@@ -1,10 +1,8 @@
 import express from "express";
-import cors from "cors";
-import borrowRouter from "./api/borrow";
+import borrowRouter from "./routes/borrow.router";
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
 app.use("/", borrowRouter);

@@ -1,23 +1,9 @@
+import { GetBookDetails } from "../connections/catalog.connection";
+import { BORROW_DAYS } from "../constants/borrow.constants";
+import { addDays, calculateFine } from "../helpers";
 import { BorrowRepository, BorrowRepositoryType } from "../repository/borrow.repository";
 import { SendBorrowBookMessage, SendReturnBookMessage } from "./broker.service";
-import { GetBookDetails } from "../utils/broker/api";
 
-const BORROW_DAYS = 10;
-const FINE_PER_DAY = 5;
-
-const addDays = (date: Date, days: number) => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
-
-const calculateFine = (dueAt: Date, returnedAt: Date): number => {
-  if (returnedAt <= dueAt) return 0;
-
-  const diffMs = returnedAt.getTime() - dueAt.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  return diffDays * FINE_PER_DAY;
-};
 
 export const BorrowBook = async (
   userId: number,

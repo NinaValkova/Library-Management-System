@@ -1,7 +1,6 @@
 import "dotenv/config";
 import expressApp from "./express.app";
-import { logger } from "./utils/logger";
-import { InitializeBroker } from "./service/broker.service";
+import { InitializeBroker, DisconnectBroker} from "./service/broker.service";
 import { APP_PORT } from "./config";
 
 const PORT = APP_PORT || 4002;
@@ -9,16 +8,30 @@ const PORT = APP_PORT || 4002;
 export const StartServer = async () => {
   await InitializeBroker();
 
-  expressApp.listen(PORT, () => {
-    logger.info(`Borrow service is listening on port ${PORT}`);
+  const server = expressApp.listen(PORT, () => {
+    console.log(`Borrow service is listening on port ${PORT}`);
   });
 
+  const shutdown = async () => {
+    console.log("Shutting down Borrow Service...");
+
+    await DisconnectBroker();
+
+    server.close(() => {
+      console.log("HTTP server closed");
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGINT", shutdown);
+
   process.on("uncaughtException", async (err) => {
-    logger.error(err);
+    console.error(err);
+    await DisconnectBroker();
     process.exit(1);
   });
 };
 
 StartServer().then(() => {
-  logger.info("borrow service is up");
+  console.log("borrow service is up");
 });
