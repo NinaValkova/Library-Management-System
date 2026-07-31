@@ -1,6 +1,8 @@
 import { Consumer, Kafka, logLevel, Partitioners, Producer } from "kafkajs";
-import { MessageBrokerType, MessageHandler, PublishType } from "./broker.type";
-import { MessageType, CatalogEvents, TOPIC_TYPE } from "../../types";
+import { MessageType } from "../../types/consumer/message.type";
+import { CatalogEvents } from "../../types/events";
+import { MessageBrokerType, MessageHandler } from "./message.broker.type";
+import { TOPIC_TYPE } from "../../types/topics";
 
 const CLIENT_ID = process.env.CLIENT_ID || "catalog-service";
 const GROUP_ID = process.env.GROUP_ID || "catalog-service-group";
@@ -61,27 +63,6 @@ const disconnectProducer = async (): Promise<void> => {
   }
 };
 
-const publish = async (data: PublishType): Promise<boolean> => {
-  const producer = await connectProducer<Producer>();
-
-  const cleanHeaders = Object.fromEntries(
-    Object.entries(data.headers || {}).filter(([_, v]) => v !== undefined),
-  );
-
-  const result = await producer.send({
-    topic: data.topic,
-    messages: [
-      {
-        headers: cleanHeaders,
-        key: String(data.event),
-        value: JSON.stringify(data.message),
-      },
-    ],
-  });
-
-  return result.length > 0;
-};
-
 const connectConsumer = async <T>(): Promise<T> => {
   if (consumer) {
     return consumer as unknown as T;
@@ -139,7 +120,6 @@ const subscribe = async (
 export const MessageBroker: MessageBrokerType = {
   connectProducer,
   disconnectProducer,
-  publish,
   connectConsumer,
   disconnectConsumer,
   subscribe,

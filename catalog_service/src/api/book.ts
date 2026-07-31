@@ -11,10 +11,20 @@ import {
   // ReturnBook,
 } from "../service/book.service";
 import { BookQueryParams } from "../types/book.query.params";
+import { CreateBookRequest } from "../dto/request/CreateBookRequest";
+import { BookResponse } from "../dto/response/BookResponse";
+import { BookQueryRequest } from "../dto/request/BookQueryRequest";
 
-const router = express.Router();
+import { BooksCountResponse } from "../dto/response/BooksCountResponse";
+import { BookParams } from "../dto/request/BookParams";
+import { UpdateBookRequest } from "../dto/request/UpdateBookRequest";
+import { AllBookResponse } from "../dto/response/AllBookResponse";
+import { Pagination } from "../dto/response/Pagination";
 
-router.post("/books", async (req: Request, res: Response) => {
+export const createBook = async (
+    req: Request<{}, {}, CreateBookRequest>,
+    res: Response<BookResponse | { message: string }>
+) => {
   try {
     const data = await CreateBook(req.body);
 
@@ -23,9 +33,12 @@ router.post("/books", async (req: Request, res: Response) => {
     const err = error as Error;
     return res.status(400).json({ message: err.message });
   }
-});
+};
 
-router.get("/books", async (req: Request, res: Response) => {
+export const getBooks = async (
+    req: Request<{}, {}, {}, BookQueryRequest>,
+    res: Response<Pagination | { message: string }>
+) => {
   try {
     const params: BookQueryParams = {
       pageIndex: Number(req.query.pageIndex) || 1,
@@ -44,9 +57,12 @@ router.get("/books", async (req: Request, res: Response) => {
     const err = error as Error;
     return res.status(500).json({ message: err.message });
   }
-});
+};
 
-router.get("/books/count", async (req: Request, res: Response) => {
+export const getBooksCount = async (
+    _req: Request,
+    res: Response<BooksCountResponse | { message: string }>
+) => {
   try {
     const data = await GetBooksCount();
     return res.status(200).json(data);
@@ -54,9 +70,12 @@ router.get("/books/count", async (req: Request, res: Response) => {
     const err = error as Error;
     return res.status(500).json({ message: err.message });
   }
-});
+};
 
-router.get("/books/:id", async (req: Request, res: Response) => {
+export const getBook = async (
+    req: Request<BookParams>,
+    res: Response<BookResponse | { message: string }>
+) => {
   try {
     const id = parseInt(req.params.id as string, 10);
 
@@ -67,9 +86,12 @@ router.get("/books/:id", async (req: Request, res: Response) => {
     const err = error as Error;
     return res.status(404).json({ message: err.message });
   }
-});
+};
 
-router.patch("/books/:id", async (req: Request, res: Response) => {
+export const updateBook = async (
+    req: Request<BookParams, {}, UpdateBookRequest>,
+    res: Response<BookResponse | { message: string }>
+) => {
   try {
     const id = parseInt(req.params.id as string, 10);
 
@@ -83,9 +105,12 @@ router.patch("/books/:id", async (req: Request, res: Response) => {
     const err = error as Error;
     return res.status(400).json({ message: err.message });
   }
-});
+};
 
-router.delete("/books/:id", async (req: Request, res: Response) => {
+export const deleteBook = async (
+    req: Request<BookParams>,
+    res: Response<BookResponse | { message: string }>
+) => {
   try {
     const id = parseInt(req.params.id as string, 10);
 
@@ -96,9 +121,12 @@ router.delete("/books/:id", async (req: Request, res: Response) => {
     const err = error as Error;
     return res.status(400).json({ message: err.message });
   }
-});
+};
 
-router.get("/books/export/all", async (_req: Request, res: Response) => {
+export const getAllBooks = async (
+    _req: Request,
+    res: Response<AllBookResponse[] | { message: string }>
+) => {
   try {
     const data = await GetAllBooks();
     return res.status(200).json(data);
@@ -106,7 +134,7 @@ router.get("/books/export/all", async (_req: Request, res: Response) => {
     const err = error as Error;
     return res.status(500).json({ message: err.message });
   }
-});
+};
 
 /*
 
@@ -141,5 +169,3 @@ router.post("/books/:id/return", async (req: Request, res: Response) => {
 });
 
 */
-
-export default router;

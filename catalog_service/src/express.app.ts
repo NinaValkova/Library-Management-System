@@ -1,5 +1,5 @@
 import express from "express";
-import bookRouter from "./api/book";
+import bookRouter from "./routes/book.router";
 
 const app = express();
 

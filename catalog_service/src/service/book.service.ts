@@ -179,28 +179,28 @@ export const GetAllBooks = async (
   }));
 };
 
-const buildBookRatingSummary = (book: {
-  score1: number;
-  score2: number;
-  score3: number;
-  score4: number;
-  score5: number;
-}) => {
-  const ratingsCount =
-    book.score1 + book.score2 + book.score3 + book.score4 + book.score5;
+// const buildBookRatingSummary = (book: {
+//   score1: number;
+//   score2: number;
+//   score3: number;
+//   score4: number;
+//   score5: number;
+// }) => {
+//   const ratingsCount =
+//     book.score1 + book.score2 + book.score3 + book.score4 + book.score5;
 
-  const weightedSum =
-    book.score1 * 1 +
-    book.score2 * 2 +
-    book.score3 * 3 +
-    book.score4 * 4 +
-    book.score5 * 5;
+//   const weightedSum =
+//     book.score1 * 1 +
+//     book.score2 * 2 +
+//     book.score3 * 3 +
+//     book.score4 * 4 +
+//     book.score5 * 5;
 
-  const averageRating =
-    ratingsCount === 0 ? 0 : Number((weightedSum / ratingsCount).toFixed(2));
+//   const averageRating =
+//     ratingsCount === 0 ? 0 : Number((weightedSum / ratingsCount).toFixed(2));
 
-  return {
-    ratingsCount,
-    averageRating,
-  };
-};
+//   return {
+//     ratingsCount,
+//     averageRating,
+//   };
+// };

@@ -1,64 +1,76 @@
 import { Consumer, Producer } from "kafkajs";
+
 import { MessageBroker } from "../utils/broker";
-import { CatalogEvents, MessageType } from "../types";
-import { BorrowBook, ReturnBook, ApplyBookRating } from "./book.service";
 
-export class BrokerService {
-  private producer: Producer | null = null;
-  private consumer: Consumer | null = null;
+import {
+  BorrowBook,
+  ReturnBook,
+  ApplyBookRating,
+} from "./book.service";
+import { MessageType } from "../types/consumer/message.type";
+import { CatalogEvents } from "../types/events";
 
-  public async initializeBroker() {
-    this.producer = await MessageBroker.connectProducer<Producer>();
-    this.producer.on("producer.connect", async () => {
-      console.log("Catalog Service Producer connected successfully");
-    });
+export const InitializeBroker = async (): Promise<void> => {
+  const producer = await MessageBroker.connectProducer<Producer>();
 
-    this.consumer = await MessageBroker.connectConsumer<Consumer>();
-    this.consumer.on("consumer.connect", async () => {
-      console.log("Catalog Service Consumer connected successfully");
-    });
+  producer.on("producer.connect", () => {
+    console.log("Catalog Service Producer connected successfully");
+  });
 
-    await MessageBroker.subscribe(
-      this.handleMessage,
-      "CatalogEvents",
-    );
-  }
+  const consumer = await MessageBroker.connectConsumer<Consumer>();
 
-  private async handleMessage(message: MessageType) {
-    console.log("Catalog service received message", message);
+  consumer.on("consumer.connect", () => {
+    console.log("Catalog Service Consumer connected successfully");
+  });
 
-    switch (message.event) {
-      case CatalogEvents.BORROW_BOOK: {
-        const { bookId, userId } = message.data as {
-          bookId: number;
-          userId: number;
-        };
+  await MessageBroker.subscribe(
+    HandleMessage,
+    "CatalogEvents"
+  );
+};
 
-        await BorrowBook(bookId, userId);
-        break;
-      }
+export const DisconnectBroker = async (): Promise<void> => {
+  await MessageBroker.disconnectConsumer();
+  await MessageBroker.disconnectProducer();
+};
 
-      case CatalogEvents.RETURN_BOOK: {
-        const { bookId, userId } = message.data as {
-          bookId: number;
-          userId: number;
-        };
+const HandleMessage = async (
+  message: MessageType
+): Promise<void> => {
+  console.log("Catalog service received message", message);
 
-        await ReturnBook(bookId, userId);
-        break;
-      }
-      case CatalogEvents.BOOK_RATED: {
-        const { bookId, rating } = message.data as {
-          bookId: number;
-          rating: number;
-        };
+  switch (message.event) {
+    case CatalogEvents.BORROW_BOOK: {
+      const { bookId, userId } = message.data as {
+        bookId: number;
+        userId: number;
+      };
 
-        await ApplyBookRating(bookId, rating);
-        break;
-      }
-
-      default:
-        console.log("Unhandled catalog event:", message.event);
+      await BorrowBook(bookId, userId);
+      break;
     }
+
+    case CatalogEvents.RETURN_BOOK: {
+      const { bookId, userId } = message.data as {
+        bookId: number;
+        userId: number;
+      };
+
+      await ReturnBook(bookId, userId);
+      break;
+    }
+
+    case CatalogEvents.BOOK_RATED: {
+      const { bookId, rating } = message.data as {
+        bookId: number;
+        rating: number;
+      };
+
+      await ApplyBookRating(bookId, rating);
+      break;
+    }
+
+    default:
+      console.log("Unhandled catalog event:", message.event);
   }
-}
+};
