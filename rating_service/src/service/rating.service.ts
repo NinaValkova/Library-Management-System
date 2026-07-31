@@ -1,9 +1,9 @@
+import { GetBookDetails } from "../connections/catalog.connection";
 import {
   RatingRepository,
   RatingRepositoryType,
 } from "../repository/rating.repository";
 import { SendBookRatedMessage, SendSparkRatedMessage } from "./broker.service";
-import { GetBookDetails } from "../utils/broker/api";
 
 export const RateBook = async (
   userId: number,

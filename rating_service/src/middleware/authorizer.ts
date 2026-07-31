@@ -1,5 +1,19 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidateUser } from "../utils";
+import { ValidateUser } from "../connections/auth.connection";
+
+export interface User {
+  id: number;
+  username: string;
+  role?: string;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
 
 export const RequestAuthorizer = async (
   req: Request,

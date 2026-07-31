@@ -1,5 +1,5 @@
-import express, { Request, Response, NextFunction } from "express";
-import { RequestAuthorizer } from "../routes/middleware";
+import { Request, Response } from "express";
+
 import {
   RateBook,
   GetMyRatingForBook,
@@ -7,115 +7,146 @@ import {
   ExportRatingsDataset,
 } from "../service/rating.service";
 
-const router = express.Router();
+import { RatingBookParams } from "../dto/request/RatingBookParams";
 
-router.post(
-  "/ratings/:bookId",
-  RequestAuthorizer,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = req.user;
+import { RatingResponse } from "../dto/response/RatingResponse";
+import { RateBookResponse } from "../dto/response/RateBookResponse";
+import { BookRatingSummaryResponse } from "../dto/response/BookRatingSummaryResponse";
+import { RatingDatasetResponse } from "../dto/response/RatingDatasetResponse";
+import { RatingRequest } from "../dto/request/RatingRequest.dto";
 
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+export const rateBook = async (
+  req: Request<RatingBookParams, any, RatingRequest>,
+  res: Response<RateBookResponse | { message: string }>
+) => {
+  try {
+    const user = req.user;
 
-      const bookIdParam = req.params.bookId;
-
-      if (typeof bookIdParam !== "string") {
-        return res.status(400).json({ message: "Invalid book id" });
-      }
-
-      const bookId = parseInt(bookIdParam, 10);
-      const { rating } = req.body;
-
-      if (Number.isNaN(bookId)) {
-        return res.status(400).json({ message: "Invalid book id" });
-      }
-
-      const result = await RateBook(user.id, bookId, Number(rating));
-
-      return res.status(201).json({
-        message: "Rating saved successfully",
-        data: result,
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized",
       });
-    } catch (error) {
-      const err = error as Error;
-      return res.status(400).json({ message: err.message });
     }
-  }
-);
 
-router.get(
-  "/ratings/:bookId/me",
-  RequestAuthorizer,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = req.user;
+    const bookId = parseInt(req.params.bookId, 10);
 
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const bookIdParam = req.params.bookId;
-
-      if (typeof bookIdParam !== "string") {
-        return res.status(400).json({ message: "Invalid book id" });
-      }
-
-      const bookId = parseInt(bookIdParam, 10);
-
-      if (Number.isNaN(bookId)) {
-        return res.status(400).json({ message: "Invalid book id" });
-      }
-
-      const result = await GetMyRatingForBook(user.id, bookId);
-
-      return res.status(200).json(result ?? null);
-    } catch (error) {
-      const err = error as Error;
-      return res.status(400).json({ message: err.message });
+    if (Number.isNaN(bookId)) {
+      return res.status(400).json({
+        message: "Invalid book id",
+      });
     }
-  }
-);
 
-router.get(
-  "/ratings/:bookId/summary",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const bookIdParam = req.params.bookId;
+    const { rating } = req.body;
 
-      if (typeof bookIdParam !== "string") {
-        return res.status(400).json({ message: "Invalid book id" });
-      }
-
-      const bookId = parseInt(bookIdParam, 10);
-
-      if (Number.isNaN(bookId)) {
-        return res.status(400).json({ message: "Invalid book id" });
-      }
-
-      const result = await GetBookRatingSummary(bookId);
-
-      return res.status(200).json(result);
-    } catch (error) {
-      const err = error as Error;
-      return res.status(400).json({ message: err.message });
+    if (
+      !Number.isInteger(rating) ||
+      rating < 1 ||
+      rating > 5
+    ) {
+      return res.status(400).json({
+        message: "Rating must be an integer between 1 and 5",
+      });
     }
-  }
-);
 
-router.get(
-  "/ratings/export/all",
-  async (_req: Request, res: Response, next: NextFunction) => {
-    try {
-      const result = await ExportRatingsDataset();
-      return res.status(200).json(result);
-    } catch (error) {
-      const err = error as Error;
-      return res.status(400).json({ message: err.message });
+    const result = await RateBook(
+      user.id,
+      bookId,
+      rating
+    );
+
+    return res.status(201).json({
+      message: "Rating saved successfully",
+      data: result,
+    });
+  } catch (error) {
+    const err = error as Error;
+
+    return res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+export const getMyRatingForBook = async (
+  req: Request<RatingBookParams>,
+  res: Response<
+    RatingResponse | null | { message: string }
+  >
+) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
     }
-  }
-);
 
-export default router;
+    const bookId = parseInt(req.params.bookId, 10);
+
+    if (Number.isNaN(bookId)) {
+      return res.status(400).json({
+        message: "Invalid book id",
+      });
+    }
+
+    const result = await GetMyRatingForBook(
+      user.id,
+      bookId
+    );
+
+    return res.status(200).json(result ?? null);
+  } catch (error) {
+    const err = error as Error;
+
+    return res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+export const getBookRatingSummary = async (
+  req: Request<RatingBookParams>,
+  res: Response<
+    BookRatingSummaryResponse | { message: string }
+  >
+) => {
+  try {
+    const bookId = parseInt(req.params.bookId, 10);
+
+    if (Number.isNaN(bookId)) {
+      return res.status(400).json({
+        message: "Invalid book id",
+      });
+    }
+
+    const result = await GetBookRatingSummary(bookId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    const err = error as Error;
+
+    return res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+export const exportRatingsDataset = async (
+  _req: Request,
+  res: Response<
+    RatingDatasetResponse[] | { message: string }
+  >
+) => {
+  try {
+    const result = await ExportRatingsDataset();
+
+    return res.status(200).json(result);
+  } catch (error) {
+    const err = error as Error;
+
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};

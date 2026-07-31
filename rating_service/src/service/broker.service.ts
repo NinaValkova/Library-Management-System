@@ -9,14 +9,18 @@ export const InitializeBroker = async () => {
   });
 };
 
+export const DisconnectBroker = async (): Promise<void> => {
+  await MessageBroker.disconnectProducer();
+};
+
 export const SendBookRatedMessage = async (data: {
   bookId: number;
   rating: number;
 }) => {
   await MessageBroker.publish({
-    event: RatingEvent.BOOK_RATED,
-    topic: "CatalogEvents",
     headers: {},
+    topic: "CatalogEvents",
+    event: RatingEvent.BOOK_RATED,
     message: data,
   });
 };
@@ -27,9 +31,9 @@ export const SendSparkRatedMessage = async (data: {
   rating: number;
 }) => {
   await MessageBroker.publish({
-    event: RatingEvent.BOOK_RATED,
-    topic: "RatingEvents",
     headers: {},
+    topic: "RatingEvents",
+    event: RatingEvent.BOOK_RATED,
     message: data,
   });
 };

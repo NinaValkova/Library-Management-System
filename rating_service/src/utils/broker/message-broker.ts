@@ -1,9 +1,8 @@
-import { Consumer, Kafka, logLevel, Partitioners, Producer } from "kafkajs";
-import { MessageBrokerType, MessageHandler, PublishType } from "./broker.type";
-import { MessageType, RatingEvent, TOPIC_TYPE } from "../../types";
+import { Kafka, logLevel, Partitioners, Producer } from "kafkajs";
+import { MessageBrokerType} from "./message.broker.type";
+import { PublishType } from "../../types";
 
 const CLIENT_ID = process.env.CLIENT_ID || "rating-service";
-const GROUP_ID = process.env.GROUP_ID || "rating-service-group";
 const BROKERS = [process.env.BROKER_1 || "localhost:9092"];
 
 const kafka = new Kafka({
@@ -13,7 +12,6 @@ const kafka = new Kafka({
 });
 
 let producer: Producer;
-let consumer: Consumer;
 
 const createTopic = async (topics: string[]) => {
   const topicConfigs = topics.map((t) => ({
@@ -80,65 +78,8 @@ const publish = async (data: PublishType): Promise<boolean> => {
   return result.length > 0;
 };
 
-const connectConsumer = async <T>(): Promise<T> => {
-  if (consumer) {
-    return consumer as unknown as T;
-  }
-
-  consumer = kafka.consumer({
-    groupId: GROUP_ID,
-  });
-
-  await consumer.connect();
-  return consumer as unknown as T;
-};
-
-const disconnectConsumer = async (): Promise<void> => {
-  if (consumer) {
-    await consumer.disconnect();
-  }
-};
-
-const subscribe = async (
-  messageHandler: MessageHandler,
-  topic: TOPIC_TYPE,
-): Promise<void> => {
-  const consumer = await connectConsumer<Consumer>();
-
-  await consumer.subscribe({ topic, fromBeginning: true });
-
-  await consumer.run({
-    eachMessage: async ({ topic: receivedTopic, partition, message }) => {
-      if (receivedTopic !== topic) return;
-
-      if (message.key && message.value) {
-        const inputMessage: MessageType = {
-          ...(message.headers
-            ? { headers: message.headers as Record<string, any> }
-            : {}),
-          event: message.key.toString() as RatingEvent,
-          data: JSON.parse(message.value.toString()),
-        };
-
-        await messageHandler(inputMessage);
-
-        await consumer.commitOffsets([
-          {
-            topic: receivedTopic,
-            partition,
-            offset: (Number(message.offset) + 1).toString(),
-          },
-        ]);
-      }
-    },
-  });
-};
-
 export const MessageBroker: MessageBrokerType = {
   connectProducer,
   disconnectProducer,
-  publish,
-  connectConsumer,
-  disconnectConsumer,
-  subscribe,
+  publish
 };

@@ -1,10 +1,8 @@
 import express from "express";
-import cors from "cors";
-import ratingRouter from "./api/rating";
+import ratingRouter from "./routes/rating.router";
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
 app.use("/", ratingRouter);
