@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+
 from pipeline.prediction_pipeline import recommendation
 
 app = FastAPI(
@@ -8,19 +8,12 @@ app = FastAPI(
     version="3.0"
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/")
 def root():
-    return {"message": "Library Recommender API"}
+    return {
+        "message": "Library Recommender API"
+    }
 
 
 @app.get("/recommend/{user_id}")
@@ -41,4 +34,7 @@ def recommend_books(user_id: int):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
