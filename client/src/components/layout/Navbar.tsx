@@ -26,6 +26,9 @@ export default function Navbar() {
         <nav className="nav-links">
           <NavLink to="/">Начало</NavLink>
           <NavLink to="/books">Каталог</NavLink>
+          {isAuthenticated && (
+            <NavLink to="/forum">Форум</NavLink>
+          )}
         </nav>
 
         <div className="nav-actions">

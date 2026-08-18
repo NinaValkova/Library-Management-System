@@ -16,8 +16,7 @@ export async function apiRequest<T>(
   const data = isJson ? await response.json() : null;
 
   if (!response.ok) {
-    const message =
-      data?.message || data?.error || "Something went wrong";
+    const message = data?.message || data?.error || "Something went wrong";
     throw new Error(message);
   }
 

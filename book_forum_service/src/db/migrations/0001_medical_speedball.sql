@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ADD COLUMN "heading" varchar(255) NOT NULL;
