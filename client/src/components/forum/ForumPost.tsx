@@ -155,7 +155,6 @@ export default function ForumPost({
   return (
     <article className="forum-post">
 
-      {/* POST HEADER */}
       <div className="forum-post-header">
         <div className="forum-avatar">
           {post.username
@@ -183,10 +182,8 @@ export default function ForumPost({
         )}
       </div>
 
-      {/* POST BODY */}
       <div className="forum-post-body">
 
-        {/* CLICKABLE HEADING */}
         <Link
           to={`/forum/posts/${post.id}`}
           className="forum-post-heading"
@@ -197,10 +194,8 @@ export default function ForumPost({
         <p>{post.body}</p>
       </div>
 
-      {/* POST ACTIONS */}
       <div className="forum-post-actions">
 
-        {/* LIKE */}
         <button
           type="button"
           className={`forum-action-button ${
@@ -220,7 +215,6 @@ export default function ForumPost({
           <span>{post.likeCount}</span>
         </button>
 
-        {/* COMMENTS */}
         <button
           type="button"
           className="forum-action-button"
@@ -235,7 +229,6 @@ export default function ForumPost({
           <span>{post.commentCount}</span>
         </button>
 
-        {/* OPEN FULL POST */}
         <Link
           to={`/forum/posts/${post.id}`}
           className="forum-action-button forum-open-post"
@@ -247,7 +240,6 @@ export default function ForumPost({
         </Link>
       </div>
 
-      {/* COMMENTS */}
       {showComments && (
         <div className="forum-comments">
 
@@ -257,7 +249,6 @@ export default function ForumPost({
             onDeleteComment={handleDeleteComment}
           />
 
-          {/* CREATE COMMENT */}
           {isAuthenticated && (
             <form
               className="forum-comment-form"

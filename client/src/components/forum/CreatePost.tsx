@@ -81,7 +81,6 @@ export default function CreatePost({
       className="forum-create-box"
       onSubmit={handleSubmit}
     >
-      {/* USER */}
       <div className="forum-create-user">
         <div className="forum-avatar">
           {auth.user?.username
@@ -92,9 +91,6 @@ export default function CreatePost({
         <span>{auth.user?.username}</span>
       </div>
 
-      {/* ======================== */}
-      {/* STEP 1 - HEADING */}
-      {/* ======================== */}
 
       {step === 1 && (
         <>
@@ -127,10 +123,6 @@ export default function CreatePost({
           </div>
         </>
       )}
-
-      {/* ======================== */}
-      {/* STEP 2 - DESCRIPTION */}
-      {/* ======================== */}
 
       {step === 2 && (
         <>
