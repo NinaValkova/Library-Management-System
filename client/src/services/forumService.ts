@@ -6,6 +6,11 @@ import type {
   LikeResult,
 } from "../models/forum";
 
+import type {
+  Poll,
+  PollVote,
+} from "../models/poll";
+
 interface GraphQLResponse<T> {
   data?: T;
 
@@ -42,7 +47,9 @@ async function graphqlRequest<T>(
   );
 
   if (!response.ok) {
-    throw new Error("Forum request failed");
+    throw new Error(
+      "Forum request failed"
+    );
   }
 
   const result: GraphQLResponse<T> =
@@ -65,6 +72,10 @@ async function graphqlRequest<T>(
 }
 
 const forumService = {
+  // ========================================
+  // POSTS
+  // ========================================
+
   async getPosts(): Promise<ForumPost[]> {
     const data = await graphqlRequest<{
       getPosts: ForumPost[];
@@ -210,6 +221,35 @@ const forumService = {
     return data.createPost;
   },
 
+  async deletePost(
+    postId: string,
+    token: string
+  ): Promise<string> {
+    const data = await graphqlRequest<{
+      deletePost: string;
+    }>(
+      `
+        mutation DeletePost(
+          $postId: ID!
+        ) {
+          deletePost(
+            postId: $postId
+          )
+        }
+      `,
+      {
+        postId,
+      },
+      token
+    );
+
+    return data.deletePost;
+  },
+
+  // ========================================
+  // COMMENTS
+  // ========================================
+
   async createComment(
     postId: string,
     body: string,
@@ -246,58 +286,6 @@ const forumService = {
     return data.createComment;
   },
 
-  async likePost(
-    postId: string,
-    token: string
-  ): Promise<LikeResult> {
-    const data = await graphqlRequest<{
-      likePost: LikeResult;
-    }>(
-      `
-        mutation LikePost(
-          $postId: ID!
-        ) {
-          likePost(
-            postId: $postId
-          ) {
-            liked
-          }
-        }
-      `,
-      {
-        postId,
-      },
-      token
-    );
-
-    return data.likePost;
-  },
-
-  async deletePost(
-    postId: string,
-    token: string
-  ): Promise<string> {
-    const data = await graphqlRequest<{
-      deletePost: string;
-    }>(
-      `
-        mutation DeletePost(
-          $postId: ID!
-        ) {
-          deletePost(
-            postId: $postId
-          )
-        }
-      `,
-      {
-        postId,
-      },
-      token
-    );
-
-    return data.deletePost;
-  },
-
   async deleteComment(
     commentId: string,
     token: string
@@ -328,6 +316,231 @@ const forumService = {
     );
 
     return data.deleteComment;
+  },
+
+  // ========================================
+  // LIKES
+  // ========================================
+
+  async likePost(
+    postId: string,
+    token: string
+  ): Promise<LikeResult> {
+    const data = await graphqlRequest<{
+      likePost: LikeResult;
+    }>(
+      `
+        mutation LikePost(
+          $postId: ID!
+        ) {
+          likePost(
+            postId: $postId
+          ) {
+            liked
+          }
+        }
+      `,
+      {
+        postId,
+      },
+      token
+    );
+
+    return data.likePost;
+  },
+
+  // ========================================
+  // POLLS
+  // ========================================
+
+  async getPolls(): Promise<Poll[]> {
+    const data = await graphqlRequest<{
+      getPolls: Poll[];
+    }>(`
+      query GetPolls {
+        getPolls {
+          id
+          userId
+          username
+          question
+          createdAt
+
+          voteCount
+
+          options {
+            id
+            pollId
+            text
+          }
+
+          votes {
+            id
+            pollId
+            optionId
+            userId
+            createdAt
+          }
+        }
+      }
+    `);
+
+    return data.getPolls;
+  },
+
+  async getPoll(
+    pollId: string
+  ): Promise<Poll> {
+    const data = await graphqlRequest<{
+      getPoll: Poll;
+    }>(
+      `
+        query GetPoll(
+          $pollId: ID!
+        ) {
+          getPoll(
+            pollId: $pollId
+          ) {
+            id
+            userId
+            username
+            question
+            createdAt
+
+            voteCount
+
+            options {
+              id
+              pollId
+              text
+            }
+
+            votes {
+              id
+              pollId
+              optionId
+              userId
+              createdAt
+            }
+          }
+        }
+      `,
+      {
+        pollId,
+      }
+    );
+
+    return data.getPoll;
+  },
+
+  async createPoll(
+    question: string,
+    options: string[],
+    token: string
+  ): Promise<Poll> {
+    const data = await graphqlRequest<{
+      createPoll: Poll;
+    }>(
+      `
+        mutation CreatePoll(
+          $question: String!
+          $options: [String!]!
+        ) {
+          createPoll(
+            question: $question
+            options: $options
+          ) {
+            id
+            userId
+            username
+            question
+            createdAt
+
+            voteCount
+
+            options {
+              id
+              pollId
+              text
+            }
+
+            votes {
+              id
+              pollId
+              optionId
+              userId
+              createdAt
+            }
+          }
+        }
+      `,
+      {
+        question,
+        options,
+      },
+      token
+    );
+
+    return data.createPoll;
+  },
+
+  async votePoll(
+    pollId: number,
+    optionId: number,
+    token: string
+  ): Promise<PollVote> {
+    const data = await graphqlRequest<{
+      votePoll: PollVote;
+    }>(
+      `
+        mutation VotePoll(
+          $pollId: ID!
+          $optionId: ID!
+        ) {
+          votePoll(
+            pollId: $pollId
+            optionId: $optionId
+          ) {
+            id
+            pollId
+            optionId
+            userId
+            createdAt
+          }
+        }
+      `,
+      {
+        pollId,
+        optionId,
+      },
+      token
+    );
+
+    return data.votePoll;
+  },
+
+  async deletePoll(
+    pollId: number,
+    token: string
+  ): Promise<string> {
+    const data = await graphqlRequest<{
+      deletePoll: string;
+    }>(
+      `
+        mutation DeletePoll(
+          $pollId: ID!
+        ) {
+          deletePoll(
+            pollId: $pollId
+          )
+        }
+      `,
+      {
+        pollId,
+      },
+      token
+    );
+
+    return data.deletePoll;
   },
 };
 

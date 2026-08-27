@@ -15,6 +15,13 @@
       "when": 1787068791010,
       "tag": "0001_medical_speedball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787177409135,
+      "tag": "0002_burly_maginty",
+      "breakpoints": true
     }
   ]
 }

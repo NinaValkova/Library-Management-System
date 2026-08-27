@@ -18,7 +18,12 @@ import {
   likeResolvers,
 } from "./likes.resolver";
 
+import {
+  pollResolvers,
+} from "./polls.resolver";
+
 export const resolvers = {
+
   Post: {
     comments: async (
       parent: {
@@ -65,11 +70,13 @@ export const resolvers = {
 
   Query: {
     ...postResolvers.Query,
+    ...pollResolvers.Query,
   },
 
   Mutation: {
     ...postResolvers.Mutation,
     ...commentResolvers.Mutation,
     ...likeResolvers.Mutation,
+    ...pollResolvers.Mutation,
   },
 };

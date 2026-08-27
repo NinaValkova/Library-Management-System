@@ -14,7 +14,8 @@ export const createContext = async ({
 }: {
   req: Request;
 }): Promise<GraphQLContext> => {
-  const authorization = req.headers.authorization;
+  const authorization =
+    req.headers.authorization;
 
   if (!authorization) {
     return {
@@ -23,7 +24,8 @@ export const createContext = async ({
   }
 
   try {
-    const user = await ValidateUser(authorization);
+    const user =
+      await ValidateUser(authorization);
 
     return {
       user,

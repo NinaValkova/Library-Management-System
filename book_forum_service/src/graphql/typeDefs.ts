@@ -36,9 +36,39 @@ export const typeDefs = `#graphql
     liked: Boolean!
   }
 
+  type Poll {
+    id: ID!
+    userId: Int!
+    username: String!
+    question: String!
+    createdAt: String!
+
+    options: [PollOption!]!
+    votes: [PollVote!]!
+
+    voteCount: Int!
+  }
+
+  type PollOption {
+    id: ID!
+    pollId: Int!
+    text: String!
+  }
+
+  type PollVote {
+    id: ID!
+    pollId: Int!
+    optionId: Int!
+    userId: Int!
+    createdAt: String!
+  }
+
   type Query {
     getPosts: [Post!]!
     getPost(postId: ID!): Post
+
+    getPolls: [Poll!]!
+    getPoll(pollId: ID!): Poll
   }
 
   type Mutation {
@@ -47,7 +77,9 @@ export const typeDefs = `#graphql
       body: String!
     ): Post!
 
-    deletePost(postId: ID!): String!
+    deletePost(
+      postId: ID!
+    ): String!
 
     createComment(
       postId: ID!
@@ -61,5 +93,19 @@ export const typeDefs = `#graphql
     likePost(
       postId: ID!
     ): LikeResult!
+
+    createPoll(
+      question: String!
+      options: [String!]!
+    ): Poll!
+
+    votePoll(
+      pollId: ID!
+      optionId: ID!
+    ): PollVote!
+
+    deletePoll(
+      pollId: ID!
+    ): String!
   }
 `;
