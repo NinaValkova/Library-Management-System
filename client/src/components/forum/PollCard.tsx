@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -16,11 +15,15 @@ export default function PollCard({
   poll,
   onChanged,
 }: Props) {
-  const { auth, isAuthenticated } =
-    useAuth();
+  const {
+    auth,
+    isAuthenticated,
+  } = useAuth();
 
-  const [selectedOption, setSelectedOption] =
-    useState<number | null>(null);
+  const [
+    selectedOption,
+    setSelectedOption,
+  ] = useState<number | null>(null);
 
   const [loading, setLoading] =
     useState(false);
@@ -28,39 +31,53 @@ export default function PollCard({
   const currentUserId =
     auth.user?.id;
 
+  // Find current user's vote
   const myVote =
     poll.votes.find(
       (vote) =>
         vote.userId === currentUserId
     );
 
-  const hasVoted = !!myVote;
+  const hasVoted = Boolean(myVote);
 
   const getVotes = (
     optionId: number
-  ) =>
-    poll.votes.filter(
+  ) => {
+    return poll.votes.filter(
       (vote) =>
         vote.optionId === optionId
     ).length;
+  };
 
   const percentage = (
     optionId: number
   ) => {
-    if (!poll.voteCount) return 0;
+    if (poll.voteCount === 0) {
+      return 0;
+    }
 
     return Math.round(
-      (getVotes(optionId) /
-        poll.voteCount) *
-        100
+      (
+        getVotes(optionId) /
+        poll.voteCount
+      ) * 100
     );
   };
 
   const handleVote = async () => {
-    if (!auth.token) {
+    if (!isAuthenticated || !auth.token) {
       toast.error(
         "Трябва да влезете в профила си."
       );
+
+      return;
+    }
+
+    if (hasVoted) {
+      toast.warning(
+        "Вече сте гласували в тази анкета."
+      );
+
       return;
     }
 
@@ -68,6 +85,7 @@ export default function PollCard({
       toast.warning(
         "Изберете опция."
       );
+
       return;
     }
 
@@ -80,6 +98,13 @@ export default function PollCard({
         auth.token
       );
 
+      toast.success(
+        "Вашият глас е записан."
+      );
+
+      setSelectedOption(null);
+
+      // Reload polls so votes and voteCount update
       await onChanged();
     } catch (err) {
       toast.error(
@@ -97,7 +122,9 @@ export default function PollCard({
   ) => {
     const date = new Date(value);
 
-    return Number.isNaN(date.getTime())
+    return Number.isNaN(
+      date.getTime()
+    )
       ? value
       : date.toLocaleString();
   };
@@ -119,13 +146,18 @@ export default function PollCard({
           </strong>
 
           <span>
-            {formatDate(poll.createdAt)}
+            {formatDate(
+              poll.createdAt
+            )}
           </span>
         </div>
 
         <div className="poll-badge">
           <i className="bi bi-bar-chart-fill" />
-          Анкета
+
+          <span>
+            Анкета
+          </span>
         </div>
 
       </div>
@@ -136,6 +168,8 @@ export default function PollCard({
           {poll.question}
         </h2>
 
+        {/* USER HAS NOT VOTED */}
+
         {!hasVoted ? (
           <>
             <div className="poll-options">
@@ -144,17 +178,22 @@ export default function PollCard({
                 (option) => (
                   <label
                     key={option.id}
-                    className={`poll-option ${
-                      selectedOption === option.id
-                        ? "selected"
-                        : ""
-                    }`}
+                    className={
+                      `poll-option ${
+                        selectedOption ===
+                        option.id
+                          ? "selected"
+                          : ""
+                      }`
+                    }
                   >
                     <input
                       type="radio"
                       name={`poll-${poll.id}`}
+                      value={option.id}
                       checked={
-                        selectedOption === option.id
+                        selectedOption ===
+                        option.id
                       }
                       onChange={() =>
                         setSelectedOption(
@@ -172,10 +211,12 @@ export default function PollCard({
 
             </div>
 
+            {/* VOTE BUTTON */}
+
             {isAuthenticated && (
               <button
-                className="btn btn-primary poll-vote-button"
                 type="button"
+                className="btn btn-primary poll-vote-button"
                 onClick={handleVote}
                 disabled={
                   loading ||
@@ -187,59 +228,93 @@ export default function PollCard({
                   : "Гласувай"}
               </button>
             )}
+
+            {!isAuthenticated && (
+              <p className="muted-text">
+                Влезте в профила си,
+                за да гласувате.
+              </p>
+            )}
           </>
         ) : (
+
+          /* USER ALREADY VOTED */
+
           <div className="poll-results">
 
             {poll.options.map(
-              (option) => (
-                <div
-                  className="poll-result"
-                  key={option.id}
-                >
+              (option) => {
+                const optionVotes =
+                  getVotes(option.id);
 
-                  <div className="poll-result-header">
-                    <span>
-                      {option.text}
-                    </span>
+                const optionPercentage =
+                  percentage(option.id);
 
-                    <strong>
-                      {percentage(option.id)}%
-                    </strong>
+                const isMyVote =
+                  myVote?.optionId ===
+                  option.id;
+
+                return (
+                  <div
+                    className="poll-result"
+                    key={option.id}
+                  >
+
+                    <div className="poll-result-header">
+
+                      <span>
+                        {option.text}
+
+                        {isMyVote && (
+                          <>
+                            {" "}
+                            <i className="bi bi-check-circle-fill" />
+                          </>
+                        )}
+                      </span>
+
+                      <strong>
+                        {optionPercentage}%
+                      </strong>
+
+                    </div>
+
+                    <div className="poll-progress">
+
+                      <div
+                        className={
+                          `poll-progress-fill ${
+                            isMyVote
+                              ? "my-vote"
+                              : ""
+                          }`
+                        }
+                        style={{
+                          width:
+                            `${optionPercentage}%`,
+                        }}
+                      />
+
+                    </div>
+
+                    <small>
+                      {optionVotes} гласа
+                    </small>
+
                   </div>
-
-                  <div className="poll-progress">
-
-                    <div
-                      className={`poll-progress-fill ${
-                        myVote?.optionId === option.id
-                          ? "my-vote"
-                          : ""
-                      }`}
-                      style={{
-                        width: `${percentage(option.id)}%`,
-                      }}
-                    />
-
-                  </div>
-
-                  <small>
-                    {getVotes(option.id)} гласа
-                  </small>
-
-                </div>
-              )
+                );
+              }
             )}
 
           </div>
         )}
 
         <div className="poll-footer">
-
           <i className="bi bi-people" />
 
-          {poll.voteCount} гласа
-
+          <span>
+            {poll.voteCount} гласа
+          </span>
         </div>
 
       </div>

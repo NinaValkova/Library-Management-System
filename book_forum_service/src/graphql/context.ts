@@ -1,4 +1,6 @@
-import { Request } from "express";
+import {
+  Request,
+} from "express";
 
 import {
   AuthUser,
@@ -9,30 +11,33 @@ export interface GraphQLContext {
   user: AuthUser | null;
 }
 
-export const createContext = async ({
-  req,
-}: {
-  req: Request;
-}): Promise<GraphQLContext> => {
-  const authorization =
-    req.headers.authorization;
+export const createContext =
+  async ({
+    req,
+  }: {
+    req: Request;
+  }): Promise<GraphQLContext> => {
+    const authorization =
+      req.headers.authorization;
 
-  if (!authorization) {
-    return {
-      user: null,
-    };
-  }
+    if (!authorization) {
+      return {
+        user: null,
+      };
+    }
 
-  try {
-    const user =
-      await ValidateUser(authorization);
+    try {
+      const user =
+        await ValidateUser(
+          authorization
+        );
 
-    return {
-      user,
-    };
-  } catch {
-    return {
-      user: null,
-    };
-  }
-};
+      return {
+        user,
+      };
+    } catch {
+      return {
+        user: null,
+      };
+    }
+  };

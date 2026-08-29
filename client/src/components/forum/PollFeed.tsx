@@ -1,4 +1,3 @@
-
 import type { Poll } from "../../models/poll";
 
 import PollCard from "./PollCard";
@@ -12,7 +11,7 @@ export default function PollFeed({
   polls,
   onChanged,
 }: Props) {
-  if (!polls.length) {
+  if (polls.length === 0) {
     return null;
   }
 

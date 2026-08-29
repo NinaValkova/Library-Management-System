@@ -47,8 +47,15 @@ export default function ForumPage() {
     setIsCreatePollOpen,
   ] = useState(false);
 
+  // Admin check
   const isAdmin =
-    auth.user?.role === "admin";
+    auth.user?.role?.toLowerCase() ===
+    "admin";
+
+  // Temporary debugging
+  console.log("AUTH USER:", auth.user);
+  console.log("ROLE:", auth.user?.role);
+  console.log("IS ADMIN:", isAdmin);
 
   const loadForum =
     useCallback(async () => {
@@ -109,6 +116,8 @@ export default function ForumPage() {
         "Публикацията е добавена."
       );
 
+      setIsCreatePostOpen(false);
+
       await loadForum();
     } catch (err) {
       toast.error(
@@ -152,6 +161,8 @@ export default function ForumPage() {
         "Анкетата е добавена."
       );
 
+      setIsCreatePollOpen(false);
+
       await loadForum();
     } catch (err) {
       toast.error(
@@ -170,8 +181,13 @@ export default function ForumPage() {
 
   return (
     <section className="forum-page">
-      {/* TOP ACTION BUTTONS */}
+
+      {/* CREATE MENU */}
+
       <div className="forum-create-menu">
+
+        {/* Every authenticated forum user */}
+
         <button
           type="button"
           className="forum-create-type-button"
@@ -186,6 +202,8 @@ export default function ForumPage() {
           </span>
         </button>
 
+        {/* ADMIN ONLY */}
+
         {isAdmin && (
           <button
             type="button"
@@ -194,13 +212,14 @@ export default function ForumPage() {
               setIsCreatePollOpen(true)
             }
           >
-            <i className="bi bi-bar-chart" />
+            <i className="bi bi-bar-chart-fill" />
 
             <span>
               Създай анкета
             </span>
           </button>
         )}
+
       </div>
 
       <hr className="forum-menu-divider" />
@@ -239,6 +258,8 @@ export default function ForumPage() {
         onCreate={handleCreatePost}
       />
 
+      {/* ADMIN ONLY */}
+
       {isAdmin && (
         <CreatePollModal
           open={isCreatePollOpen}
@@ -248,6 +269,7 @@ export default function ForumPage() {
           onCreate={handleCreatePoll}
         />
       )}
+
     </section>
   );
 }

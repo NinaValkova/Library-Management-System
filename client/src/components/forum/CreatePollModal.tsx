@@ -1,9 +1,10 @@
-
 import { useState } from "react";
+
 import useAuth from "../../hooks/useAuth";
 
 interface Props {
   open: boolean;
+
   onClose: () => void;
 
   onCreate: (
@@ -31,13 +32,17 @@ export default function CreatePollModal({
   const [loading, setLoading] =
     useState(false);
 
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   const updateOption = (
     index: number,
     value: string
   ) => {
-    const updated = [...options];
+    const updated = [
+      ...options,
+    ];
 
     updated[index] = value;
 
@@ -54,11 +59,14 @@ export default function CreatePollModal({
   const removeOption = (
     index: number
   ) => {
-    if (options.length <= 2) return;
+    if (options.length <= 2) {
+      return;
+    }
 
     setOptions(
       options.filter(
-        (_, i) => i !== index
+        (_, currentIndex) =>
+          currentIndex !== index
       )
     );
   };
@@ -78,10 +86,11 @@ export default function CreatePollModal({
         )
         .filter(Boolean);
 
-    if (
-      !questionValue ||
-      optionValues.length < 2
-    ) {
+    if (!questionValue) {
+      return;
+    }
+
+    if (optionValues.length < 2) {
       return;
     }
 
@@ -94,6 +103,7 @@ export default function CreatePollModal({
       );
 
       setQuestion("");
+
       setOptions([
         "",
         "",
@@ -105,16 +115,38 @@ export default function CreatePollModal({
     }
   };
 
+  const handleOverlayClick = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (
+      event.target ===
+      event.currentTarget
+    ) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="forum-modal-overlay">
-      <div className="forum-modal">
+    <div
+      className="forum-modal-overlay"
+      onClick={handleOverlayClick}
+    >
+      <div
+        className="forum-modal"
+        role="dialog"
+        aria-modal="true"
+      >
 
         <div className="forum-modal-header">
+
           <div>
-            <h2>Създай анкета</h2>
+            <h2>
+              Създай анкета
+            </h2>
 
             <p>
-              Попитайте читателите за мнение.
+              Попитайте читателите
+              за мнение.
             </p>
           </div>
 
@@ -125,11 +157,13 @@ export default function CreatePollModal({
           >
             <i className="bi bi-x-lg" />
           </button>
+
         </div>
 
         <form onSubmit={handleSubmit}>
 
           <div className="forum-create-user">
+
             <div className="forum-avatar">
               {auth.user?.username
                 ?.charAt(0)
@@ -139,6 +173,7 @@ export default function CreatePollModal({
             <span>
               {auth.user?.username}
             </span>
+
           </div>
 
           <label className="forum-label">
@@ -150,7 +185,9 @@ export default function CreatePollModal({
             type="text"
             value={question}
             onChange={(event) =>
-              setQuestion(event.target.value)
+              setQuestion(
+                event.target.value
+              )
             }
             placeholder="Например: Коя книга искате да добавим?"
             autoFocus
@@ -168,6 +205,7 @@ export default function CreatePollModal({
                   className="poll-option-row"
                   key={index}
                 >
+
                   <input
                     type="text"
                     value={option}
@@ -177,7 +215,9 @@ export default function CreatePollModal({
                         event.target.value
                       )
                     }
-                    placeholder={`Опция ${index + 1}`}
+                    placeholder={
+                      `Опция ${index + 1}`
+                    }
                   />
 
                   {options.length > 2 && (
@@ -191,6 +231,7 @@ export default function CreatePollModal({
                       <i className="bi bi-trash" />
                     </button>
                   )}
+
                 </div>
               )
             )}
@@ -204,7 +245,9 @@ export default function CreatePollModal({
           >
             <i className="bi bi-plus-circle" />
 
-            Добави опция
+            <span>
+              Добави опция
+            </span>
           </button>
 
           <div className="forum-modal-actions">
@@ -223,7 +266,13 @@ export default function CreatePollModal({
               className="btn btn-primary"
               disabled={
                 loading ||
-                !question.trim()
+                !question.trim() ||
+                options
+                  .map((option) =>
+                    option.trim()
+                  )
+                  .filter(Boolean)
+                  .length < 2
               }
             >
               {loading
@@ -234,6 +283,7 @@ export default function CreatePollModal({
           </div>
 
         </form>
+
       </div>
     </div>
   );

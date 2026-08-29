@@ -72,9 +72,6 @@ async function graphqlRequest<T>(
 }
 
 const forumService = {
-  // ========================================
-  // POSTS
-  // ========================================
 
   async getPosts(): Promise<ForumPost[]> {
     const data = await graphqlRequest<{
@@ -246,10 +243,6 @@ const forumService = {
     return data.deletePost;
   },
 
-  // ========================================
-  // COMMENTS
-  // ========================================
-
   async createComment(
     postId: string,
     body: string,
@@ -318,10 +311,6 @@ const forumService = {
     return data.deleteComment;
   },
 
-  // ========================================
-  // LIKES
-  // ========================================
-
   async likePost(
     postId: string,
     token: string
@@ -348,10 +337,6 @@ const forumService = {
 
     return data.likePost;
   },
-
-  // ========================================
-  // POLLS
-  // ========================================
 
   async getPolls(): Promise<Poll[]> {
     const data = await graphqlRequest<{

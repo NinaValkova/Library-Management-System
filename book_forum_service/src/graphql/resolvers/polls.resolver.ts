@@ -49,6 +49,15 @@ export const pollResolvers = {
         );
       }
 
+      if (
+        context.user.role
+          .toLowerCase() !== "admin"
+      ) {
+        throw new Error(
+          "Only administrators can create polls"
+        );
+      }
+
       return CreatePoll(
         context.user.id,
         context.user.username,
@@ -71,16 +80,23 @@ export const pollResolvers = {
         );
       }
 
-      const pollId = Number(args.pollId);
-      const optionId = Number(args.optionId);
+      const pollId =
+        Number(args.pollId);
 
-      if (Number.isNaN(pollId)) {
+      const optionId =
+        Number(args.optionId);
+
+      if (
+        Number.isNaN(pollId)
+      ) {
         throw new Error(
           "Invalid poll id"
         );
       }
 
-      if (Number.isNaN(optionId)) {
+      if (
+        Number.isNaN(optionId)
+      ) {
         throw new Error(
           "Invalid option id"
         );
@@ -106,9 +122,12 @@ export const pollResolvers = {
         );
       }
 
-      const pollId = Number(args.pollId);
+      const pollId =
+        Number(args.pollId);
 
-      if (Number.isNaN(pollId)) {
+      if (
+        Number.isNaN(pollId)
+      ) {
         throw new Error(
           "Invalid poll id"
         );
